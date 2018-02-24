@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
 using Microsoft.Bot.Connector;
+using MongoDB.Bson;
+using SimpleBot.Entity;
+using SimpleBot.Repository;
 
 namespace SimpleBot
 {
@@ -14,7 +17,7 @@ namespace SimpleBot
         [ResponseType(typeof(void))]
         public virtual async Task<HttpResponseMessage> Post([FromBody] Activity activity)
         {
-            if ( activity != null && activity.Type == ActivityTypes.Message)
+            if (activity != null && activity.Type == ActivityTypes.Message)
             {
                 await HandleActivityAsync(activity);
             }
@@ -29,6 +32,7 @@ namespace SimpleBot
             string text = activity.Text;
             string userFromId = activity.From.Id;
             string userFromName = activity.From.Name;
+     
 
             var message = new Message(userFromId, userFromName, text);
 

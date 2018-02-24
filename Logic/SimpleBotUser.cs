@@ -1,7 +1,10 @@
-﻿using System;
+﻿using SimpleBot.Repository;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using SimpleBot.Entity;
+using SimpleBot.Repository.MongoRepositories;
 
 namespace SimpleBot
 {
@@ -9,7 +12,23 @@ namespace SimpleBot
     {
         public static string Reply(Message message)
         {
-            return $"{message.User} disse '{message.Text}'";
+            var profile = UserProfileRepository.Instance.BuscaPorId(message.Usuario);
+            if (profile == null)
+            {
+                UserProfileRepository.Instance.Inserir(new UserProfile()
+                {
+                    EntityId = message.Usuario,
+                    Visitas = 0,
+                });
+            }
+            var resposta = $"{message.Usuario} disse '{message.Texto}' e falou conosco : { profile.Visitas} vezes";
+
+            profile.Visitas++;
+            UserProfileRepository.Instance.Atualizar(profile);
+
+            MessageRepositoryMongo.Instance.Inserir(message);
+
+            return resposta;
         }
 
         public static UserProfile GetProfile(string id)
